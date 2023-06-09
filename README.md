@@ -19,3 +19,21 @@ Use cases in Data Science application:
 - Analyse SME default probabilities:
     - Number of similar businesses around the client location
     - Types of businesses around the client location
+
+## Examples
+You can select tiles granularity by passing zoom attribute. Tile can be 100 meters width at zoom level 18 down to 6 meters width with zoom level 22:
+![|100](./img/zoom_example.png)
+
+
+Convert POI to tile (All POIs in the tile are associated with the tile center)
+![|100](./img/tiles_descritization.png)
+
+
+Tiles have X and Y coordinates and work very much as normal 
+coordinate systems
+![|100](./img/tiles_coordinates.png)
+
+## If you like this library:
+You can help in developing and maintaining this library by:
+- adding star to the repository;
+- writing review by suggesting a feature or reporting an issue;
