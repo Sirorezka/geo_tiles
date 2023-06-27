@@ -1,5 +1,5 @@
 ## Description:
-GIS data science by applying discrete tiles transformation to GPS coordinates.
+GIS data science using geohashing tricks. Applying to GPS coordinates transformation which outputs discrete tiles. Numpy based library.
 
 ## When you can use this approach:
 For System architect and enigineers(Software, engineers, Data engineers):
