@@ -1,8 +1,13 @@
-import osmnx as ox
+"""Methods for extracting data from Openstreetmap."""
 import geopandas as gpd
+import osmnx as ox
 
 
 def get_london_pubs():
+    """List all pubs in London.
+
+    You will need internet connection to run this function.
+    """
     # Get place boundary related to the place name as a geodataframe
     tags = {"amenity": "pub"}
 

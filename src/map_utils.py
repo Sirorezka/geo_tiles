@@ -1,7 +1,9 @@
+"""Funcitons for plotting points and geometries on a map."""
 import folium
 import numpy as np
-from src import plot_utils
 from folium.features import DivIcon
+
+from src import plot_utils
 
 
 def add_points_to_map(
@@ -11,6 +13,7 @@ def add_points_to_map(
     color: str = "blue",
     radius: float = 10,
 ):
+    """Add points to the map object."""
     n_points = len(lon_arr)
     for i in range(n_points):
         folium.CircleMarker(
@@ -25,15 +28,10 @@ def add_tile_to_map(
     tile_y_idx: int,
     zoom: int,
     map_obj: folium.Map,
-    radius: float = 10,
     color: str = "blue",
     font_size: int = -1,
-):
-    """
-    Plot single tile based on it's coordinates.
-
-    """
-
+):  # pylint: disable=too-many-arguments
+    """Plot single tile based on it's X,Y index."""
     # Tile box coordinates
     tile_box_coord = plot_utils.get_tile_box_coords(tile_x_idx, tile_y_idx, zoom)
 
@@ -53,7 +51,8 @@ def add_tile_to_map(
             icon=DivIcon(
                 icon_size=(150, 36),
                 icon_anchor=(20, 20),
-                html=f"<div style='font-size: {font_size}pt'>[{tile_x_idx},<br> {tile_y_idx}]</div>",
+                html=f"<div style='font-size: {font_size}pt'>"
+                + f"[{tile_x_idx},<br> {tile_y_idx}]</div>",
             ),
         ).add_to(map_obj)
 
@@ -67,6 +66,7 @@ def add_box_to_map(
     radius: float = 10,
     color: str = "blue",
 ):
+    """Graph a line given array of points (lon/lat arrays)."""
     n_points = len(lon_arr)
     locations = [[lat_arr[i], lon_arr[i]] for i in range(n_points)]
 

@@ -1,7 +1,19 @@
-from src import geometry_converter, np_tiles_converter
+"""Search all tiles in given radius from given point."""
+from typing import Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Tuple
+
+from src import np_tiles_converter
+
+
+def _xy_combinations(x_arr: np.ndarray, y_arr: np.ndarray) -> np.ndarray:
+    """Fast cartesian product of two arrays.
+
+    Given two arrays returns all combinations of their members.
+    any x <-> any y
+    """
+    return np.dstack(np.meshgrid(x_arr, y_arr)).reshape(-1, 2)
 
 
 def get_nearby_tiles(
@@ -17,11 +29,11 @@ def get_nearby_tiles(
         radius - radius in meters
 
     """
-
+    # pylint: disable=too-many-locals
     assert "lon" in df_coords.columns
     assert "lat" in df_coords.columns
     assert radius > 0
-    assert zoom >= 1 and zoom <= 23
+    assert 1 <= zoom <= 23
 
     # we will need to add ids to all coordinates:
     n_coords = df_coords.shape[0]
@@ -31,7 +43,7 @@ def get_nearby_tiles(
 
     coord_lat = df_coords["lat"].values
     coord_lon = df_coords["lon"].values
-    coord_id = np.ogrid[:n_coords]  ## simply indexing [0,1,2,3,4,...]
+    coord_id = np.arange(0, n_coords)  ## simply indexing [0,1,2,3,4,...]
 
     # for each input coordinate
     # 1. get it's tile X,Y indexes
@@ -67,15 +79,15 @@ def get_nearby_tiles(
 
     max_x_lim = x_tiles_lim.max()
     max_y_lim = y_tiles_lim.max()
-    max_xy = np.max([x_tiles_lim, y_tiles_lim], axis=0)  # max among x and y
 
     # To get full circle in given radius we need to check all nearby tiles:
     # by applying negative shifts (moving left/up) and positive shifts (moving right/down)
     # Because search is symmetric, let's only search one quarter of the circle
     # by checking only positive shifts
-    shifts_xy = geometry_converter._xy_combinations(
-        np.ogrid[: max_x_lim + 1],
-        np.ogrid[: max_y_lim + 1],
+
+    shifts_xy = _xy_combinations(
+        np.arange(0, max_x_lim + 1),
+        np.arange(0, max_y_lim + 1),
     )
     shifts_xy = shifts_xy.astype(np.int32)
     n_shifts = shifts_xy.shape[0]
@@ -143,17 +155,21 @@ def get_nearby_tiles(
 def _cover_full_circle(
     coords: np.ndarray, shifts_x: np.ndarray, shifts_y: np.ndarray
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Extrapolating shifts from circle Q1 to other quarters.
+    """Extrapolating shifts from circle Q1 to other quarters.
+
+    Returns:
+        point_id - id of initial point,
+        nbr_x - x tile coord of a neigbour
+        nbr_y - y tile coord of a neigbour
     """
     # neighbours in given distance
-    nbr_id = np.array([])
+    point_id = np.array([])
     nbr_x = np.array([])
     nbr_y = np.array([])
 
     near_x = coords[:, 3] + 1 * shifts_x
     near_y = coords[:, 4] + 1 * shifts_y
-    nbr_id = np.concatenate([nbr_id, coords[:, 0]])
+    point_id = np.concatenate([point_id, coords[:, 0]])
     nbr_x = np.concatenate([nbr_x, near_x])
     nbr_y = np.concatenate([nbr_y, near_y])
 
@@ -165,7 +181,7 @@ def _cover_full_circle(
 
     near_x = coords[:, 3] + -1 * shifts_x
     near_y = coords[:, 4] + -1 * shifts_y
-    nbr_id = np.concatenate([nbr_id, coords[:, 0]])
+    point_id = np.concatenate([point_id, coords[:, 0]])
     nbr_x = np.concatenate([nbr_x, near_x])
     nbr_y = np.concatenate([nbr_y, near_y])
 
@@ -177,14 +193,14 @@ def _cover_full_circle(
 
     near_x = coords[:, 3] + -1 * shifts_x
     near_y = coords[:, 4] + 1 * shifts_y
-    nbr_id = np.concatenate([nbr_id, coords[:, 0]])
+    point_id = np.concatenate([point_id, coords[:, 0]])
     nbr_x = np.concatenate([nbr_x, near_x])
     nbr_y = np.concatenate([nbr_y, near_y])
 
     near_x = coords[:, 3] + 1 * shifts_x
     near_y = coords[:, 4] + -1 * shifts_y
-    nbr_id = np.concatenate([nbr_id, coords[:, 0]])
+    point_id = np.concatenate([point_id, coords[:, 0]])
     nbr_x = np.concatenate([nbr_x, near_x])
     nbr_y = np.concatenate([nbr_y, near_y])
 
-    return nbr_id, nbr_x, nbr_y
+    return point_id, nbr_x, nbr_y

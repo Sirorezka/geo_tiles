@@ -1,41 +1,44 @@
+"""Converting closed polygon to tiles."""
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 from shapely.geometry.polygon import Polygon
+
 from src import np_tiles_converter as tiles_converter
-import geopandas as gpd
 
 
-def _xy_combinations(x: np.ndarray, y: np.ndarray):
+def _xy_combinations(x_arr: np.ndarray, y_arr: np.ndarray) -> np.ndarray:
     """Fast cartesian product of two arrays.
 
     Given two arrays returns all combinations of their members.
     any x <-> any y
     """
-    return np.dstack(np.meshgrid(x, y)).reshape(-1, 2)
+    return np.dstack(np.meshgrid(x_arr, y_arr)).reshape(-1, 2)
 
 
 def polygon_to_tiles(geo_polygon: Polygon) -> pd.DataFrame:
-    """Returns all tiles lat/lon coords that are inside given polygon."""
+    """Return all tiles lat/lon coords that are inside given polygon."""
+    # pylint: disable=too-many-locals
     assert isinstance(geo_polygon, Polygon)
 
     # coordinates of the polygon boundary
     # is is two dimensional array. Second dimension is equal to two
     # it should have shape = [:,2] and first column = lon, second = lat (!!)
-    london_bound_coords = np.array(geo_polygon.exterior.coords)
+    polygon_bound_coords = np.array(geo_polygon.exterior.coords)
 
     x_tiles_arr, y_tiles_arr = tiles_converter.np_deg2idx(
-        london_bound_coords[:, 1], london_bound_coords[:, 0], zoom=19
+        polygon_bound_coords[:, 1], polygon_bound_coords[:, 0], zoom=19
     )
 
     # for linter
-    x_tiles_arr: np.ndarray = x_tiles_arr
-    y_tiles_arr: np.ndarray = y_tiles_arr
+    x_tiles_np: np.ndarray = x_tiles_arr
+    y_tiles_np: np.ndarray = y_tiles_arr
 
     # Now we create list of all candidate tiles that could be inside our Polygon
-    min_x, max_x = x_tiles_arr.min(), x_tiles_arr.max()
-    min_y, max_y = y_tiles_arr.min(), y_tiles_arr.max()
-    all_x = np.ogrid[min_x : max_x + 1]
-    all_y = np.ogrid[min_y : max_y + 1]
+    min_x, max_x = x_tiles_np.min(), x_tiles_np.max()
+    min_y, max_y = y_tiles_np.min(), y_tiles_np.max()
+    all_x = np.arange(min_x, max_x + 1)
+    all_y = np.arange(min_y, max_y + 1)
     tiles_idx = _xy_combinations(all_x, all_y)
 
     # coordinates of tiles centers

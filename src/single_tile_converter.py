@@ -1,10 +1,12 @@
+"""Convert point coordinates to tiles."""
 import math
-import numpy as np
+from typing import Tuple
 
-from typing import Union, Dict, Tuple
+import numpy as np
 
 
 def zoom_power(zoom: int) -> float:
+    """Control for tiles granularity."""
     max_zoom = 22
 
     # clipping zoom between 0 and 19
@@ -13,7 +15,7 @@ def zoom_power(zoom: int) -> float:
 
 
 def deg2num(lat_deg: float, lon_deg: float, zoom: int) -> Tuple[int, int]:
-    """Converts degrees of longitude and latitude to x,y tile coordinates.
+    """Convert degrees of longitude and latitude to x,y tile coordinates.
 
     This function is non-vectorized version. Just a simple example how to use the formula.
 
@@ -50,11 +52,12 @@ def deg2num(lat_deg: float, lon_deg: float, zoom: int) -> Tuple[int, int]:
     # converting to radians
     lon_rad = math.radians(lon_deg)
     lat_rad = math.radians(lat_deg)
-    n = zoom_power(zoom)
+    zoom_multiplier = zoom_power(zoom)
 
     # tiles formula
-    xtile = math.floor((lon_rad + math.pi) / (2 * math.pi) * n)
-    ytile = math.floor(
-        (math.pi - math.log(math.tan(lat_rad / 2 + math.pi / 4))) / (math.pi * 2.0) * n
-    )
+    xtile = math.floor((lon_rad + math.pi) / (2 * math.pi) * zoom_multiplier)
+
+    val1 = math.pi - math.log(math.tan(lat_rad / 2 + math.pi / 4))
+    ytile = math.floor(val1 / (math.pi * 2.0) * zoom_multiplier)
+
     return (xtile, ytile)
