@@ -1,7 +1,7 @@
-## Description:
+## What is this
 GIS data science using geohashing tricks. Applying to GPS coordinates transformation which outputs discrete tiles. Numpy based library.
 
-## When you can use this approach:
+## When you could use this approach
 Software engineers and data engineers:
 - This approach is SQL and Spark friendly - you only need to store integer hashes of your locations;
 - Faster computational time - instead of complex Polygons you are using discret proxy of each object;  
@@ -21,7 +21,7 @@ Use cases and Data Science applications:
     - Types of businesses around the client location
 
 ## Tutorial
-Tutorial.ipynb provides detailed explanation how to use the library.
+`Tutorial.ipynb` - provides detailed explanation how to use the library.
 
 ## Examples
 You can select tiles granularity by passing zoom attribute. Tile can be 100 meters width at zoom level 18 down to 6 meters width with zoom level 22:<br>
@@ -35,16 +35,16 @@ Tiles have X and Y coordinates and work very much as normal
 coordinate systems:<br>
 <img src="./img/tiles_coordinates.png" height="300">
 
-Given a tile get all it's neighbours in some radius:
+Given a tile get all it's neighbours in some radius:<br>
 <img src="./img/tile_neighbours.png" height="300">
 
-Calculate number of poi in some radius from list of given locations:
-<img src="./img/count_pois_in_given_radius" height="300">
+Calculate number of poi in some radius from list of given locations:<br>
+<img src="./img/count_pois_in_given_radius.png" height="300">
 
 
 
 ## Math behind tiles conversion
-Code is reusing approach from the OpenStreetMap:<br>
+Code is reusing hashing approach described by the OpenStreetMap:<br>
 https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 
 
@@ -52,5 +52,5 @@ https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
 ## If you like this library:
 You can help in developing and maintaining this library by:
 - adding star to the repository;
-- writing review by suggesting a feature or reporting an issue;
+- writing a review, suggesting a feature or reporting an issue;
 

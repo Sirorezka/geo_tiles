@@ -1,9 +1,21 @@
 import numpy as np
 from src import np_tiles_converter
+from typing import Tuple
 
-def get_tile_box_coords(x_idx_tile: int, 
-                        y_idx_tile: int,
-                        zoom: int) -> np.ndarray:
+
+def get_tile_center_coords(
+    tile_x_idx: int, tile_y_idx: int, zoom: int
+) -> Tuple[float, float]:
+    """Return coordinates of the tile center.
+
+    Returns:
+        lat: latitude of the tile center
+        lon: longitude of the tile center
+    """
+    return np_tiles_converter.np_idx2deg(tile_x_idx, tile_y_idx, zoom=zoom)
+
+
+def get_tile_box_coords(x_idx_tile: int, y_idx_tile: int, zoom: int) -> np.ndarray:
     """Return coordinates of the tile box.
 
     Arguments:
@@ -16,20 +28,21 @@ def get_tile_box_coords(x_idx_tile: int,
     x_tile = x_idx_tile
     y_tile = y_idx_tile
 
-    tile_box = [[x_tile, y_tile],
-            [x_tile, y_tile+1],
-            [x_tile+1, y_tile+1],
-            [x_tile+1, y_tile],
-            [x_tile, y_tile], ## connects box back to the first point
-           ]
+    tile_box = [
+        [x_tile, y_tile],
+        [x_tile, y_tile + 1],
+        [x_tile + 1, y_tile + 1],
+        [x_tile + 1, y_tile],
+        [x_tile, y_tile],  ## connects box back to the first point
+    ]
 
     tile_box = np.array(tile_box)
-    (tile16_lat_deg, 
-     tile16_lon_deg) = np_tiles_converter.np_idx2deg(tile_box[:,0], 
-                                                    tile_box[:,1], 
-                                                    zoom = zoom,
-                                                    offset=0)
+    (tile16_lat_deg, tile16_lon_deg) = np_tiles_converter.np_idx2deg(
+        tile_box[:, 0], tile_box[:, 1], zoom=zoom, offset=0
+    )
 
-    tile_coord = np.concatenate([tile16_lat_deg.reshape(-1,1), tile16_lon_deg.reshape(-1,1)],axis=1)    
+    tile_coord = np.concatenate(
+        [tile16_lat_deg.reshape(-1, 1), tile16_lon_deg.reshape(-1, 1)], axis=1
+    )
 
     return tile_coord
